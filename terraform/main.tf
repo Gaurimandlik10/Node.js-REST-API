@@ -41,8 +41,9 @@ module "eks"{
      cluster_name = "proj2_cluster"
      cluster_version = "1.29"
 
-     vpc_id= aws_vpc.proj2_vpc.vpc_id
-     subnet_ids = [aws_subnet.proj2_subnet.subnet_id]
+     vpc_id     = aws_vpc.proj2_vpc.id
+     subnet_ids = [aws_subnet.proj2_subnet.id]
+
 
      enable_cluster_creator_admin_permissions = true
 
