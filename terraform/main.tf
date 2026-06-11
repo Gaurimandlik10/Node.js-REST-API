@@ -16,13 +16,13 @@ provider "aws"{
     region="ap-southeast-2"
 }
 resource "aws_vpc" "proj2_vpc"{
-    cidr-block="10.0.0.0/16"
+    cidr_block="10.0.0.0/16"
     
     tags={Name = "porj2"}
 }
 resource "aws_subnet" "proj2_subnet"{
-      vpc_id= aws.proj2_vpc.vpc_id
-      cidr-block="10.0.0.0/24"
+      vpc_id= aws_vpc.proj2_vpc.id
+      cidr_block="10.0.0.0/24"
 
       tags={Name = "proj2_subnet"}
 }
