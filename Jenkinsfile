@@ -29,7 +29,7 @@ pipeline{
                  --password-stdin  ${ECR_URL}
 
 
-                 docker tag ${ECR_REPO}:${IMAGE_TAG} \ 
+                 docker tag ${ECR_REPO}:${IMAGE_TAG} \
                   ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
                  
                  """
