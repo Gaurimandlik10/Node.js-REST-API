@@ -20,11 +20,23 @@ resource "aws_vpc" "proj2_vpc"{
     
     tags={Name = "porj2"}
 }
-resource "aws_subnet" "proj2_subnet"{
-      vpc_id= aws_vpc.proj2_vpc.id
-      cidr_block="10.0.0.0/24"
+resource "aws_subnet" "proj2_subnet_1" {
+  vpc_id            = aws_vpc.proj2_vpc.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "ap-southeast-2a"
+  tags = {
+    Name = "proj2_subnet_1"
+  }
+}
 
-      tags={Name = "proj2_subnet"}
+# ✅ Subnet 2 — AZ b (required by EKS)
+resource "aws_subnet" "proj2_subnet_2" {
+  vpc_id            = aws_vpc.proj2_vpc.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "ap-southeast-2b"
+  tags = {
+    Name = "proj2_subnet_2"
+  }
 }
 resource "aws_ecr_repository" "proj2_ecr"{
     name= "proj2_ecr"
@@ -42,7 +54,8 @@ module "eks"{
      cluster_version = "1.29"
 
      vpc_id     = aws_vpc.proj2_vpc.id
-     subnet_ids = [aws_subnet.proj2_subnet.id]
+     subnet_ids = [aws_subnet.proj2_subnet_1.id,
+                   aws_subnet.proj2_subnet_2.id]
 
 
      enable_cluster_creator_admin_permissions = true
