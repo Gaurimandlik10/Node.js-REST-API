@@ -4,9 +4,9 @@ COPY package*.json ./
 RUN npm install  --production
 
 COPY . .
-EXPOSE 80
+EXPOSE 3000
 
-RUN addgroup -s appgroup && adduser -S appuser  -G appgroup
+RUN addgroup -S appgroup && adduser -S appuser  -G appgroup
 USER appuser
 
 CMD [ "node","server.js" ]
