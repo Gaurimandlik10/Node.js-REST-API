@@ -15,8 +15,6 @@ pipeline{
         stage('Git checkout'){
              steps{
                 echo "Git clonning ...."
-                git url : "https://github.com/Gaurimandlik10/Node.js-REST-API.git",
-                branch: "main"
 
              }
         }
