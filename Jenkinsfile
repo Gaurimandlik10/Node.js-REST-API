@@ -12,12 +12,6 @@ pipeline{
 
     }
     stages{
-        stage('Git checkout'){
-             steps{
-                echo "Git clonning ...."
-
-             }
-        }
         stage('Build Docker Image'){
             steps{
                 echo "Builing Docker Image...."
