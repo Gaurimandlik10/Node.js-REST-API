@@ -1,6 +1,6 @@
 terraform{
     required_providers{
-        aws{
+        aws={
             source="hashicorp/aws"
             version="~> 5.0"
         }
@@ -42,7 +42,7 @@ module "eks"{
      cluster_version = "1.29"
 
      vpc_id= aws_vpc.proj2_vpc.vpc_id
-     subnet_id = [aws_subnet.proj2_subnet.subnet_id]
+     subnet_ids = [aws_subnet.proj2_subnet.subnet_id]
 
      enable_cluster_creator_admin_permissions = true
 
