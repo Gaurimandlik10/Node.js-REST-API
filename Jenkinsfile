@@ -6,7 +6,7 @@ pipeline{
         AWS_DEFAULT_REGION    = 'ap-southeast-2'
         AWS_ACCOUNT_ID        = '500345929326'
         ECR_REPO              = "proj2_ecr"
-        IMAGE_TAG             = "latest"
+        IMAGE_TAG             = "${env.BUILD_NUMBER}"
         ECR_URL               = "${AWS_ACCOUNT_ID}.dkr.ecr.ap-southeast-2.amazonaws.com"
         EC2_IP                = ''
 
@@ -15,7 +15,7 @@ pipeline{
         stage('Build Docker Image'){
             steps{
                 echo "Builing Docker Image...."
-                sh"docker build -t ${ ECR_REPO }:${ IMAGE_TAG } ."
+                sh"docker build -t ${ ECR_REPO }:${ IMAGE_TAG } ./app"
             }
         }
         stage('push to ECR'){
