@@ -80,7 +80,7 @@ module "eks" {
   version = "~> 20.0"
 
   cluster_name    = "proj2_cluster"
-  cluster_version = "1.29"
+  cluster_version = "1.32"
 
   vpc_id     = aws_vpc.proj2_vpc.id
   subnet_ids = [
