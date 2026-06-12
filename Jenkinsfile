@@ -1,6 +1,7 @@
-pipeline{
+pipeline {
     agent any
-    environment{
+
+    environment {
         AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
         AWS_DEFAULT_REGION    = 'ap-southeast-2'
@@ -8,86 +9,77 @@ pipeline{
         ECR_REPO              = "proj2_ecr"
         IMAGE_TAG             = "${env.BUILD_NUMBER}"
         ECR_URL               = "${AWS_ACCOUNT_ID}.dkr.ecr.ap-southeast-2.amazonaws.com"
-        EC2_IP                = ''
-
     }
-    stages{
-       
+
+    stages {
+
         stage('Clean Workspace') {
             steps {
                 sh "rm -rf ${WORKSPACE}/terraform/.terraform ${WORKSPACE}/terraform/.terraform.lock.hcl"
             }
         }
-        stage('Build Docker Image'){
-            steps{
-                echo "Builing Docker Image...."
+
+        stage('Git Checkout') {
+            steps {
+                git url: "https://github.com/Gaurimandlik10/Node.js-REST-API.git",
+                    branch: "main"
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
                 sh "docker build -t ${ECR_REPO}:${IMAGE_TAG} ./app"
             }
         }
-        stage('push to ECR'){
-            steps{
-                echo "Pushing to ECR...."
-                sh """
-                 aws ecr get-login-password \
-                 --region ${AWS_DEFAULT_REGION} | \
-                 docker login \
-                 --username AWS \
-                 --password-stdin  ${ECR_URL}
 
-           
-                 docker tag ${ECR_REPO}:${IMAGE_TAG} \
-                  ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
-                 
-                 docker push ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
-                 """
+        stage('Push to ECR') {
+            steps {
+                sh """
+                    aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
+                    docker tag ${ECR_REPO}:${IMAGE_TAG} ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
+                    docker push ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
+                """
             }
         }
-        stage('Terraform Init') {
-                      steps {
-                          dir('terraform') {
-                             sh "terraform init -reconfigure"
-                             sh "terraform import aws_ecr_repository.proj2_ecr proj2_ecr || true"
-                             sh """terraform import "module.eks.module.kms.aws_kms_alias.this[\\"cluster\\"]" alias/eks/proj2_cluster || true"""
-                             sh """terraform import "module.eks.aws_cloudwatch_log_group.this[0]" /aws/eks/proj2_cluster/cluster || true"""
-        }
-    }
-}
-        stage('Terraform apply'){
-            steps{
-                echo "Terraform apply...."
-                dir ('terraform'){
-                sh "terraform apply -auto-approve"
+
+        stage('Terraform Init + Import') {
+            steps {
+                dir('terraform') {
+                    sh "terraform init -reconfigure"
+                    sh "terraform import aws_ecr_repository.proj2_ecr proj2_ecr || true"
+                    sh """terraform import 'module.eks.module.kms.aws_kms_alias.this["cluster"]' alias/eks/proj2_cluster || true"""
+                    sh """terraform import 'module.eks.aws_cloudwatch_log_group.this[0]' /aws/eks/proj2_cluster/cluster || true"""
                 }
             }
         }
-        stage('Update Kubeconfig'){
-            steps{
-                sh """
-                aws eks update-kubeconfig \
-                --region ${AWS_DEFAULT_REGION} \
-                --name proj2_cluster
-                """
-            }
-        }
-        stage('Helm Deploy'){
-            steps{
-                sh """
-                    helm upgrade --install todo-api ./helm/todo-api \
-                        --set image.repository=${ECR_URL}/${ECR_REPO} \
-                        --set image.tag=${IMAGE_TAG} \
-                        --wait
-                """
+
+        stage('Terraform Apply') {
+            steps {
+                dir('terraform') {
+                    sh "terraform apply -auto-approve"
+                }
             }
         }
 
+        stage('Update Kubeconfig') {
+            steps {
+                sh "aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name proj2_cluster"
+            }
+        }
+
+        stage('Helm Deploy') {
+            steps {
+                sh "helm upgrade --install todo-api ./helm/todo-api --set image.repository=${ECR_URL}/${ECR_REPO} --set image.tag=${IMAGE_TAG} --wait"
+            }
+        }
     }
+
     post {
         failure {
-            sh 'helm rollback todo-api 0 || true'
+            echo "Pipeline failed at build ${IMAGE_TAG}"
         }
         success {
             echo "Pipeline completed! Image: ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}"
         }
     }
-
 }
