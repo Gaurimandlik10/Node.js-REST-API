@@ -1,4 +1,4 @@
-terraform{
+terraform {
     required_providers{
         aws={
             source="hashicorp/aws"
@@ -57,12 +57,12 @@ module "eks"{
      subnet_ids = [aws_subnet.proj2_subnet_1.id,
                    aws_subnet.proj2_subnet_2.id]
 
-
+     cluster_endpoint_public_access = true
      enable_cluster_creator_admin_permissions = true
 
      eks_managed_node_groups = {
         default ={
-            instance_types = ["t3.micro"]
+            instance_types = ["t3.medium"]
 
             min_size = 1
             max_size = 3
