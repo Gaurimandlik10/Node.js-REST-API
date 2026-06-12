@@ -12,6 +12,11 @@ pipeline{
 
     }
     stages{
+         stage('Clean Workspace') {       // ✅ wipes entire Jenkins workspace
+            steps {
+                cleanWs()
+            }
+        }
         stage('Build Docker Image'){
             steps{
                 echo "Builing Docker Image...."
