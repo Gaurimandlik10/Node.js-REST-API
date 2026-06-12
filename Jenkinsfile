@@ -12,9 +12,10 @@ pipeline{
 
     }
     stages{
-         stage('Clean Workspace') {       // ✅ wipes entire Jenkins workspace
+       
+        stage('Clean Workspace') {
             steps {
-                cleanWs()
+                sh "rm -rf ${WORKSPACE}/terraform/.terraform ${WORKSPACE}/terraform/.terraform.lock.hcl"
             }
         }
         stage('Build Docker Image'){
@@ -45,7 +46,6 @@ pipeline{
             steps{
                 echo "Terraform init...."
                 dir ('terraform'){
-                     sh "rm -rf .terraform .terraform.lock.hcl"
                      sh " terraform init -reconfigure"
                 }
             }
