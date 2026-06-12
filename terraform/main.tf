@@ -6,7 +6,7 @@ terraform {
         }
     }
     backend "s3" {
-     bucket = "proj2-terraformstate-bucket"   # ← create this S3 bucket first
+     bucket = "proj2-terraformstatebucket"   # ← create this S3 bucket first
      key    = "restnodejs/terraform.tfstate"
      region = "ap-southeast-2"
   }
