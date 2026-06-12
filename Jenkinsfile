@@ -46,9 +46,6 @@ pipeline {
             steps {
                 dir('terraform') {
                     sh "terraform init -reconfigure"
-                    sh "terraform import aws_ecr_repository.proj2_ecr proj2_ecr || true"
-                    sh """terraform import 'module.eks.module.kms.aws_kms_alias.this["cluster"]' alias/eks/proj2_cluster || true"""
-                    sh """terraform import 'module.eks.aws_cloudwatch_log_group.this[0]' /aws/eks/proj2_cluster/cluster || true"""
                 }
             }
         }
