@@ -15,7 +15,7 @@ pipeline{
         stage('Build Docker Image'){
             steps{
                 echo "Builing Docker Image...."
-                sh"docker build -t ${ ECR_REPO }:${ IMAGE_TAG } ./app"
+                sh "docker build -t ${ECR_REPO}:${IMAGE_TAG} ./app"
             }
         }
         stage('push to ECR'){
@@ -28,10 +28,11 @@ pipeline{
                  --username AWS \
                  --password-stdin  ${ECR_URL}
 
-
+           
                  docker tag ${ECR_REPO}:${IMAGE_TAG} \
                   ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
                  
+                 docker push ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
                  """
             }
         }
@@ -39,6 +40,7 @@ pipeline{
             steps{
                 echo "Terraform init...."
                 dir ('terraform'){
+                     sh "rm -rf .terraform .terraform.lock.hcl"
                      sh " terraform init -reconfigure"
                 }
             }
