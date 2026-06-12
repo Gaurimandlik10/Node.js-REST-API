@@ -26,21 +26,6 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh "docker build -t ${ECR_REPO}:${IMAGE_TAG} ./app"
-            }
-        }
-
-        stage('Push to ECR') {
-            steps {
-                sh """
-                    aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
-                    docker tag ${ECR_REPO}:${IMAGE_TAG} ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
-                    docker push ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
-                """
-            }
-        }
 
         stage('Terraform Init + Import') {
             steps {
@@ -55,6 +40,21 @@ pipeline {
                 dir('terraform') {
                     sh "terraform apply -auto-approve"
                 }
+            }
+        }
+              stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${ECR_REPO}:${IMAGE_TAG} ./app"
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                sh """
+                    aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
+                    docker tag ${ECR_REPO}:${IMAGE_TAG} ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
+                    docker push ${ECR_URL}/${ECR_REPO}:${IMAGE_TAG}
+                """
             }
         }
 
