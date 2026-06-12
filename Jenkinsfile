@@ -39,7 +39,7 @@ pipeline{
             steps{
                 echo "Terraform init...."
                 dir ('terraform'){
-                     sh " terraform init"
+                     sh " terraform init -migrate-state"
                 }
             }
         }
