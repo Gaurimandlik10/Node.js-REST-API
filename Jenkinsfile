@@ -66,7 +66,7 @@ pipeline {
 
         stage('Helm Deploy') {
             steps {
-                sh "helm upgrade --install todo-api ./helm/todo-api --set image.repository=${ECR_URL}/${ECR_REPO} --set image.tag=${IMAGE_TAG} --wait"
+                sh "helm upgrade --install todo-api ./helm/todo-api --set image.repository=${ECR_URL}/${ECR_REPO} --set image.tag=${IMAGE_TAG}"
             }
         }
     }
