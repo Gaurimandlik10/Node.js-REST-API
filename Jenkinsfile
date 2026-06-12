@@ -27,7 +27,7 @@ pipeline {
         }
 
 
-        stage('Terraform Init + Import') {
+        stage('Terraform Init') {
             steps {
                 dir('terraform') {
                     sh "terraform init -reconfigure"
@@ -42,7 +42,7 @@ pipeline {
                 }
             }
         }
-              stage('Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${ECR_REPO}:${IMAGE_TAG} ./app"
             }
